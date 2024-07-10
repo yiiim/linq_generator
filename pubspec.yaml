@@ -1,0 +1,21 @@
+name: linq_generator
+description: Generate the necessary code for the linq package.
+version: 1.0.0-dev.1
+repository: https://github.com/yiiim/linq_generator
+homepage: https://github.com/yiiim/linq_generator
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  analyzer: ^6.0.0
+  build_runner: ^2.4.9
+  source_gen: ^1.5.0
+  code_builder: ^4.10.0
+  build: ^2.4.1
+  dart_style: ^2.3.6
+  linq: ^1.0.0-dev.1
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
