@@ -5,6 +5,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:linq/linq.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:code_builder/code_builder.dart' as code;
 import 'package:dart_style/dart_style.dart';
@@ -166,7 +167,7 @@ _ => throw Exception('Unknown entity type: \$T'),
         builder.body.add(modelExtension);
       },
     );
-    return DartFormatter(pageWidth: 10000).format(genLibrary.accept(code.DartEmitter(useNullSafetySyntax: true)).toString());
+    return DartFormatter(pageWidth: 10000, languageVersion: Version(3, 10, 0)).format(genLibrary.accept(code.DartEmitter(useNullSafetySyntax: true)).toString());
   }
 }
 
@@ -176,17 +177,17 @@ class LinqGenerator extends GeneratorForAnnotation<Linq> {
     if (element is! ClassElement) throw "Linq only for class ";
     final tableName = annotation.peek("tableName")?.stringValue ?? element.name;
     final convertCamelToUnderscore = annotation.peek("convertCamelToUnderscore")?.boolValue ?? false;
-    final modelName = element.name;
+    final modelName = element.name!;
     List<_Colum> colums = [];
     final fields = element.allSupertypes.fold(
       element.fields,
       (previousValue, element) {
         List<FieldElement> fields = List.of(previousValue);
-        final annotations = TypeChecker.fromRuntime(LinqMember).annotationsOf(element.element);
+        final annotations = TypeChecker.typeNamed(LinqMember, inPackage: 'linq').annotationsOf(element.element);
 
         if (annotations.isNotEmpty) {
           for (var item in element.element.fields) {
-            if (!previousValue.any((e) => e.getDisplayString(withNullability: true) == item.getDisplayString(withNullability: true))) {
+            if (!previousValue.any((e) => e.displayName == item.displayName)) {
               fields.add(item);
             }
           }
@@ -196,12 +197,12 @@ class LinqGenerator extends GeneratorForAnnotation<Linq> {
     );
     fields.removeWhere((e) => e.getter == null || e.setter == null);
     for (var item in fields) {
-      final columReader = ConstantReader(TypeChecker.fromRuntime(LinqColum).firstAnnotationOf(item));
+      final columReader = ConstantReader(TypeChecker.typeNamed(LinqColum, inPackage: 'linq').firstAnnotationOf(item));
       final ignore = columReader.peek("ignore")?.boolValue ?? false;
       if (item.isStatic) continue;
       if (ignore) continue;
 
-      var columName = columReader.peek("colum")?.stringValue ?? item.name;
+      var columName = columReader.peek("colum")?.stringValue ?? item.name!;
       if (convertCamelToUnderscore) {
         final buffer = StringBuffer();
         for (var i = 0; i < columName.length; i++) {
@@ -539,6 +540,6 @@ get<${item.field.type.getDisplayString(withNullability: true)}>("${item.field.na
         builder.body.add(wherePseudoClassExtension);
       },
     );
-    return DartFormatter(pageWidth: 10000).format(library.accept(code.DartEmitter(useNullSafetySyntax: true)).toString());
+    return DartFormatter(pageWidth: 10000, languageVersion: Version(3, 10, 0)).format(library.accept(code.DartEmitter(useNullSafetySyntax: true)).toString());
   }
 }
