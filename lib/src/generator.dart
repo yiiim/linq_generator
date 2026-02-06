@@ -26,12 +26,12 @@ String _generateDefaultValue(DartType type) {
     return "0.0";
   } else if (type.isDartCoreBool) {
     return "false";
-  } else if (type.getDisplayString(withNullability: false) == "DateTime") {
+  } else if (type.getDisplayString() == "DateTime") {
     return "DateTime.now()";
-  } else if (type.getDisplayString(withNullability: false) == "List<int>") {
+  } else if (type.getDisplayString() == "List<int>") {
     return "[]";
   }
-  throw "Unsupported type ${type.getDisplayString(withNullability: true)}";
+  throw "Unsupported type ${type.getDisplayString()}";
 }
 
 String _escapeRune(int c) {
@@ -133,7 +133,7 @@ class LinqContextGenerator extends GeneratorForAnnotation<LinqContextObject> {
           builder.methods.add(
             code.Method(
               (field) {
-                final typeName = element.toTypeValue()!.getDisplayString(withNullability: false);
+                final typeName = element.toTypeValue()!.getDisplayString();
                 field
                   ..name = "${typeName.substring(0, 1).toLowerCase()}${typeName.substring(1)}"
                   ..type = MethodType.getter

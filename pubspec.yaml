@@ -15,6 +15,7 @@ dependencies:
   build: ^4.0.0
   linq: ^1.0.0-dev.1
   pub_semver: ^2.2.0
+  dart_style: any
 
 dev_dependencies:
   lints: ^3.0.0
