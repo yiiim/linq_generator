@@ -113,12 +113,14 @@ class _Colum {
     required this.dbType,
     this.codecFactory,
     this.isPrimaryKey = false,
+    this.isAutoIncrement = false,
   });
   final String name;
   final FieldElement field;
   final DartType dbType;
   final String? codecFactory;
   final bool isPrimaryKey;
+  final bool isAutoIncrement;
 }
 
 class LinqContextGenerator extends GeneratorForAnnotation<LinqContextObject> {
@@ -229,6 +231,7 @@ class LinqGenerator extends GeneratorForAnnotation<Linq> {
         dbType: dbType,
         codecFactory: codecFactory,
         isPrimaryKey: columReader.peek("primaryKey")?.boolValue == true,
+        isAutoIncrement: columReader.peek("autoIncrement")?.boolValue == true,
       );
       colums.add(colum);
     }
@@ -458,6 +461,7 @@ get<${item.field.type.getDisplayString(withNullability: true)}>("${item.field.na
                       isPrimaryKey: ${e.isPrimaryKey ? 'true' : 'false'},
                       get: (model) => model.${e.field.name},
                       set: (model, value) => model.${e.field.name} = value,
+                      isAutoIncrement: ${e.isPrimaryKey && e.isAutoIncrement  ? 'true' : 'false'},
                       codec: ${e.codecFactory != null ? "${e.codecFactory}" : "null"}
                     )""").join(",")}]""",
                 );
